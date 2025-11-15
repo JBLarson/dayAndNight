@@ -69,14 +69,9 @@ const DaylightViz = () => {
     const timeoutId = setTimeout(async () => {
       try {
         setIsSearching(true);
-        // Using Nominatim (OpenStreetMap) - free, no API key required
+        // Hit our backend instead of Nominatim directly
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=5`,
-          {
-            headers: {
-              'User-Agent': 'DaylightViz/1.0'
-            }
-          }
+          `http://localhost:3001/api/geocode?q=${encodeURIComponent(searchQuery)}`
         );
         const data = await response.json();
         setSuggestions(data);
