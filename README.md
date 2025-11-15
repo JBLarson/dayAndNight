@@ -2,6 +2,10 @@
 
 An interactive visualization showing annual daylight patterns for any location on Earth. **Now with multi-location comparison!**
 
+
+<img src="example_v001.png" alt="Example visualization" width="100%">
+
+
 ## Features
 
 - **Multi-Location Comparison**: Overlay up to 5 locations on a single graph
