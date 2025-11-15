@@ -16,15 +16,17 @@ body {
 
 #root {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  /* Removed flex centering to allow for top-nav layout */
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* padding: 2rem; */ /* Moved to App.jsx for better control */
 }
 
 .daylight-viz {
   max-width: 1400px;
   width: 100%;
+  margin: 0 auto; /* Center the component */
 }
 
 .header {
@@ -177,14 +179,15 @@ body {
   color: white;
 }
 
-.location-info {
+/* This rule was conflicting, removing it */
+/* .location-info {
   display: flex;
   gap: 1rem;
   justify-content: center;
   align-items: center;
   font-size: 1rem;
   color: #999;
-}
+} */
 
 .coords {
   font-size: 0.875rem;
@@ -318,10 +321,10 @@ canvas {
     font-size: 2rem;
   }
 
-  .location-info {
+  /* .location-info {
     flex-direction: column;
     gap: 0.25rem;
-  }
+  } */
 
   .search-container {
     max-width: 100%;
