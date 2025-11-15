@@ -20,14 +20,13 @@ An interactive visualization showing annual daylight patterns for any location o
 ## Setup
 
 ```bash
-# Extract the tarball
-tar -xzf daylight-viz.tar.gz
-cd daylight-viz
 
 # Install dependencies
 npm install
 
 # Run dev server
+npm run server
+&&
 npm run dev
 ```
 
