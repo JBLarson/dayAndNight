@@ -329,7 +329,12 @@ const DaylightViz = () => {
     if (hoveredDay === null || Object.keys(daylightDataMap).length === 0) return null;
     
     const firstLocation = locations[0];
-    const dayData = daylightDataMap[firstLocation.id][hoveredDay];
+    const firstLocationData = daylightDataMap[firstLocation.id];
+    
+    // Bounds check - ensure hoveredDay is within array bounds
+    if (!firstLocationData || hoveredDay >= firstLocationData.length || hoveredDay < 0) return null;
+    
+    const dayData = firstLocationData[hoveredDay];
     
     return {
       date: dayData.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
