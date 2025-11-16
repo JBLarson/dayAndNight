@@ -15,7 +15,9 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [
   'http://localhost:5173',
   'https://daylightviz.org',
-  'https://www.daylightviz.org'
+  'https://www.daylightviz.org',
+  'http://daylightviz.org',
+  'http://www.daylightviz.org'
 ];
 
 app.use(cors({
