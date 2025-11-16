@@ -7,8 +7,6 @@
     <title>daylight-viz</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Lucide icons -->
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
     <script>
       // Make Tailwind compatible with Inter font
       tailwind.config = {
@@ -27,11 +25,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module">
-      // Make Lucide icons available globally for React
-      // This is necessary because we're not using npm install
-      window.LucideReact = lucide;
-    </script>
+    <!-- Remove Lucide - we're not using it -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
