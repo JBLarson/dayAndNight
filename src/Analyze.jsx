@@ -183,8 +183,9 @@ const Analyze = () => {
     const timeoutId = setTimeout(async () => {
       try {
         setIsSearching(true);
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
         const response = await fetch(
-          `http://localhost:3001/api/geocode?q=${encodeURIComponent(searchQuery)}`
+        `${API_URL}/api/geocode?q=${encodeURIComponent(searchQuery)}`
         );
         const data = await response.json();
         setSuggestions(data);

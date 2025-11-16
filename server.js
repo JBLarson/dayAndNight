@@ -2,11 +2,32 @@
 import express from 'express';
 import cors from 'cors';
 import Database from 'better-sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// CORS configuration for production
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://daylightviz.org',
+  'https://www.daylightviz.org'
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.use(express.json());
 
 // Initialize SQLite database
@@ -38,7 +59,7 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_search_logs_timestamp ON search_logs(timestamp);
 `);
 
-// Prepared statements for performance
+// Prepared statements
 const findLocation = db.prepare('SELECT full_response, id FROM locations WHERE query = ?');
 const insertLocation = db.prepare(`
   INSERT OR IGNORE INTO locations (query, display_name, lat, lon, full_response)
@@ -49,7 +70,12 @@ const logSearch = db.prepare(`
   VALUES (?, ?, ?, ?)
 `);
 
-// Geocode endpoint - checks cache first, then hits Nominatim
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Geocode endpoint
 app.get('/api/geocode', async (req, res) => {
   const query = req.query.q;
   
@@ -61,20 +87,14 @@ app.get('/api/geocode', async (req, res) => {
   const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
   const userAgent = req.headers['user-agent'] || 'unknown';
   
-  // Check cache
   const cached = findLocation.get(normalizedQuery);
   
   if (cached) {
     console.log(`[CACHE HIT] ${query}`);
-    
-    // Log the search
     logSearch.run(query, cached.id, ip, userAgent);
-    
-    // Return cached results
     return res.json(JSON.parse(cached.full_response));
   }
   
-  // Cache miss - fetch from Nominatim
   console.log(`[CACHE MISS] ${query} - fetching from Nominatim`);
   
   try {
@@ -82,14 +102,13 @@ app.get('/api/geocode', async (req, res) => {
       `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`,
       {
         headers: {
-          'User-Agent': 'DaylightViz/1.0 Analytics Platform'
+          'User-Agent': 'DaylightViz/1.0 (daylightviz.org)'
         }
       }
     );
     
     const data = await response.json();
     
-    // Store in database
     if (data.length > 0) {
       const firstResult = data[0];
       
@@ -106,7 +125,6 @@ app.get('/api/geocode', async (req, res) => {
       
       console.log(`[CACHED] ${query} -> ${firstResult.display_name}`);
     } else {
-      // Log search even if no results
       logSearch.run(query, null, ip, userAgent);
     }
     
@@ -117,7 +135,7 @@ app.get('/api/geocode', async (req, res) => {
   }
 });
 
-// Analytics endpoint - get usage stats
+// Analytics endpoint
 app.get('/api/analytics', (req, res) => {
   const stats = {
     totalSearches: db.prepare('SELECT COUNT(*) as count FROM search_logs').get().count,
@@ -145,7 +163,7 @@ app.get('/api/analytics', (req, res) => {
   res.json(stats);
 });
 
-// Export database for backup
+// Export database
 app.get('/api/export', (req, res) => {
   const locations = db.prepare('SELECT * FROM locations ORDER BY created_at DESC').all();
   const searches = db.prepare('SELECT * FROM search_logs ORDER BY timestamp DESC').all();
@@ -158,6 +176,7 @@ app.get('/api/export', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Daylight Viz API running on http://localhost:${PORT}`);
-  console.log(`Database: ${db.name}`);
+  console.log(`🚀 Daylight Viz API running on port ${PORT}`);
+  console.log(`📊 Database: ${db.name}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

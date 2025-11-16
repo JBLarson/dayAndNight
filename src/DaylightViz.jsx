@@ -99,8 +99,9 @@ const DaylightViz = () => {
       try {
         setIsSearching(true);
         // Hit our backend instead of Nominatim directly
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
         const response = await fetch(
-          `http://localhost:3001/api/geocode?q=${encodeURIComponent(searchQuery)}`
+          `${API_URL}/api/geocode?q=${encodeURIComponent(searchQuery)}`
         );
         const data = await response.json();
         setSuggestions(data);

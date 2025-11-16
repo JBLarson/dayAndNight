@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "server": "node server.js",
+    "server:dev": "NODE_ENV=development node server.js",
     "build": "vite build",
     "preview": "vite preview"
   },
